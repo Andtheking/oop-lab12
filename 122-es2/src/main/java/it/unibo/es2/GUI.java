@@ -17,7 +17,6 @@ public final class GUI extends JFrame {
     @Serial
     private static final long serialVersionUID = 1L;
     private final Map<JButton, Pair<Integer, Integer>> buttons = new LinkedHashMap<>();
-    //private final Logics logics;
 
     /**
      * Constructs a GUI with the specified size.
@@ -25,20 +24,20 @@ public final class GUI extends JFrame {
      * @param size the size of the grid
      */
     public GUI(final int size) {
-        //this.logics = new LogicsImpl(size);
+        final Logics logics = new LogicsImpl(size);
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
         this.setSize(100 * size, 100 * size);
         // Layout
-        final var panel = new JPanel(new GridLayout(size, size));
+        final JPanel panel = new JPanel(new GridLayout(size, size));
         this.getContentPane().add(BorderLayout.CENTER, panel);
         // Buttons
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
                 final JButton button = new JButton(" ");
                 button.addActionListener(e -> {
-                    final Pair<Integer, Integer> buttonPosition = buttons.get(button);
-                    button.setText(buttonPosition.toString());
-                    if (buttonPosition.equals(new Pair<>(0, 0))) {
+                    final Pair<Integer, Integer> p = buttons.get(button);
+                    button.setText(logics.hit(p.x(), p.y()) ? "*" : " ");
+                    if (logics.isAnyRowFull() || logics.isAnyColumnFull()) {
                         // System.exit(1); // Too brutal!
                         dispose();
                     }
