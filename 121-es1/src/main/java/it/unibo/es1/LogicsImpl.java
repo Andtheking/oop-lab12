@@ -1,21 +1,29 @@
 package it.unibo.es1;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Implementation of the Logics interface.
  */
 public class LogicsImpl implements Logics {
 
-    private static final String ERROR_MESSAGE = "Unimplemented method";
+    private final int size;
+    private final List<NumberStatePair> values;
 
     /**
      * Constructor.
      *
-     * @param size the size of the logics
+     * @param logicsSize the size of the logics
      */
-    public LogicsImpl(final int size) {
-        throw new UnsupportedOperationException(ERROR_MESSAGE);
+    public LogicsImpl(final int logicsSize) {
+        size = logicsSize;
+        values = new ArrayList<>();
+        for (int i = 0; i < logicsSize; i++) {
+            values.add(new NumberStatePair(0, true));
+        }
     }
 
     /**
@@ -23,7 +31,7 @@ public class LogicsImpl implements Logics {
      */
     @Override
     public int size() {
-        throw new UnsupportedOperationException(ERROR_MESSAGE);
+        return this.size;
     }
 
     /**
@@ -31,7 +39,11 @@ public class LogicsImpl implements Logics {
      */
     @Override
     public List<Integer> values() {
-        throw new UnsupportedOperationException(ERROR_MESSAGE);
+        return Collections.unmodifiableList(
+            values.stream()
+                .map(s -> s.number)
+                .toList()
+        );
     }
 
     /**
@@ -39,7 +51,11 @@ public class LogicsImpl implements Logics {
      */
     @Override
     public List<Boolean> enabledStates() {
-        throw new UnsupportedOperationException(ERROR_MESSAGE);
+        return Collections.unmodifiableList(
+            values.stream()
+                .map(s -> s.state)
+                .toList()
+        );
     }
 
     /**
@@ -47,7 +63,7 @@ public class LogicsImpl implements Logics {
      */
     @Override
     public int hit(final int elem) {
-        throw new UnsupportedOperationException(ERROR_MESSAGE);
+        return values.get(elem).incrementNumber();
     }
 
     /**
@@ -55,7 +71,9 @@ public class LogicsImpl implements Logics {
      */
     @Override
     public String result() {
-        throw new UnsupportedOperationException(ERROR_MESSAGE);
+        return values.stream()
+            .map(s -> Integer.toString(s.getNumber()))
+            .collect(Collectors.joining("|", "<<", ">>"));
     }
 
     /**
@@ -63,6 +81,39 @@ public class LogicsImpl implements Logics {
      */
     @Override
     public boolean toQuit() {
-        throw new UnsupportedOperationException(ERROR_MESSAGE);
+        return Boolean.logicalOr(
+            values.stream()
+                .allMatch(s -> !s.isEnabled()),
+            values.stream()
+                .allMatch(s -> s.getNumber() == values.get(0).getNumber())
+        );
+    }
+
+    private final class NumberStatePair {
+        private int number;
+        private boolean state;
+
+        private NumberStatePair(final int number, final boolean state) {
+            this.number = number;
+            this.state = state;
+        }
+
+        private int getNumber() {
+            return this.number;
+        }
+
+        private int incrementNumber() {
+            this.number += 1;
+            setState(this.number < size);
+            return this.number;
+        }
+
+        private void setState(final boolean newState) {
+            this.state = newState;
+        }
+
+        private boolean isEnabled() {
+            return this.state;
+        }
     }
 }
