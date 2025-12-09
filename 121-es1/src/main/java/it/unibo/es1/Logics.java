@@ -44,7 +44,7 @@ public interface Logics {
     String result();
 
     /**
-     * True if it is time to quit (i.e., all slots have the final value).
+     * True if it is time to quit (i.e., all slots have the same value).
      *
      * @return whether it is time to quit
      */
